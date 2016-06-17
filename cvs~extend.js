@@ -88,7 +88,7 @@ function cvsProcess(cmd) {
   let data = {};
 
   try {
-    yml = fs.readFileSync(`${__dirname}/cvs-files.yml`);
+    yml = fs.readFileSync(`${ROOT_DIR}/extend/custom/fp-cvs/cvs-files.yml`);
     data = yaml.safeLoad(yml);
   }
   catch (err) {
