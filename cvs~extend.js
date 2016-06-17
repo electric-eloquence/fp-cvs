@@ -19,8 +19,10 @@ const TEMPLATES_DIR_DEFAULT = utils.backendDirCheck(ROOT_DIR, pref.backend.synce
 const TEMPLATES_EXT_DEFAULT = templater.templatesExtCheck(pref.backend.synced_dirs.templates_ext);
 
 function cvsProcessExec(cmd, file) {
-  var stdout = execSync(`cvs ${cmd} ${file}`, {encoding: conf.enc});
-  utils.log(stdout.trim());
+  var stdout = execSync(`cvs ${cmd} ${file}`, {encoding: conf.enc}).trim();
+  if (stdout) {
+    utils.log(stdout);
+  }
 }
 
 function cvsProcess(cmd) {
