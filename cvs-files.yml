@@ -1,5 +1,5 @@
 ---
-# Fepper's cvs-process tasks will automatically target Pattern Lab files with
+# Fepper's CVS tasks will automatically target Pattern Lab files with
 # corresponding YAML files.
 # To process additional CVS-revisioned files, list them here.
 cvs_files:
