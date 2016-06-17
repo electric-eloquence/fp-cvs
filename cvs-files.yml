@@ -1,0 +1,8 @@
+---
+# Fepper's cvs-process tasks will automatically target Pattern Lab files with
+# corresponding YAML files.
+# To process additional CVS-revisioned files, list them here.
+cvs_files:
+  # Use a hyphen to delimit each file as a separate array element.
+  # Do not include "backend" or a leading slash.
+  - 

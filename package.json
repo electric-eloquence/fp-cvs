@@ -1,0 +1,13 @@
+{
+  "name": "fp-cvs",
+  "version": "0.0.0",
+  "description": "CVS extension for Fepper",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/electric-eloquence/fp-cvs.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">= 4.0.0"
+  }
+}
