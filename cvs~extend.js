@@ -89,7 +89,7 @@ function cvsProcess(cmd) {
   let data = {};
 
   try {
-    yml = fs.readFileSync(`${ROOT_DIR}/extend/custom/fp-cvs/cvs-files.yml`);
+    yml = fs.readFileSync(`${ROOT_DIR}/extend/custom/fp-cvs/cvs.yml`, conf.enc);
     data = yaml.safeLoad(yml);
   }
   catch (err) {
@@ -97,7 +97,7 @@ function cvsProcess(cmd) {
     return;
   }
 
-  if (!Array.isArray(data.cvs_files)) {
+  if (!data instanceof Object || !Array.isArray(data.cvs_files)) {
     return;
   }
 

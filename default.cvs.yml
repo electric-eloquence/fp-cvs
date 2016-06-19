@@ -1,0 +1,8 @@
+# To list additional files for fp-cvs to process:
+# `mkdir ../../custom/fp-cvs`
+# `cp default.cvs.yml ../../custom/fp-cvs/cvs.yml`
+# Then list them below. Use YAML array syntax.
+cvs_files:
+  # Use a hyphen to delimit each file as a separate array element.
+  # Do not include "backend" or a leading slash.
+  - 

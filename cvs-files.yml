@@ -1,6 +1,0 @@
----
-# Copy this into extend/custom/fp-cvs/
-cvs_files:
-  # Use a hyphen to delimit each file as a separate array element.
-  # Do not include "backend" or a leading slash.
-  - 
