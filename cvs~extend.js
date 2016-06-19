@@ -11,12 +11,11 @@ const gulp = require('gulp');
 const path = require('path');
 const yaml = require('js-yaml');
 
-const templater = require('../../../core/tasks/templater');
 const utils = require('../../../core/lib/utils');
 
 const ROOT_DIR = utils.rootDir();
 const TEMPLATES_DIR_DEFAULT = utils.backendDirCheck(ROOT_DIR, pref.backend.synced_dirs.templates_dir);
-const TEMPLATES_EXT_DEFAULT = templater.templatesExtCheck(pref.backend.synced_dirs.templates_ext);
+const TEMPLATES_EXT_DEFAULT = utils.extCheck(pref.backend.synced_dirs.templates_ext);
 
 function cvsProcessExec(cmd, file) {
   var stdout = execSync(`cvs ${cmd} ${file}`, {encoding: conf.enc}).trim();
@@ -70,7 +69,7 @@ function cvsProcess(cmd) {
     }
 
     if (typeof data.templates_ext === 'string') {
-      templatesExt = templater.templatesExtCheck(data.templates_ext);
+      templatesExt = utils.extCheck(data.templates_ext);
     }
     else {
       templatesExt = TEMPLATES_EXT_DEFAULT;
