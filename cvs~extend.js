@@ -3,7 +3,6 @@
 const conf = global.conf;
 const pref = global.pref;
 
-const argv = require('yargs').argv;
 const execSync = require('child_process').execSync;
 const fs = require('fs-extra');
 const glob = require('glob');
@@ -14,8 +13,27 @@ const yaml = require('js-yaml');
 const utils = require('../../../core/lib/utils');
 
 const ROOT_DIR = utils.rootDir();
-const TEMPLATES_DIR_DEFAULT = utils.backendDirCheck(ROOT_DIR, pref.backend.synced_dirs.templates_dir);
-const TEMPLATES_EXT_DEFAULT = utils.extCheck(pref.backend.synced_dirs.templates_ext);
+
+const cvsDirDefaults = {
+  assets: utils.backendDirCheck(ROOT_DIR, pref.backend.synced_dirs.assets_dir) ? pref.backend.synced_dirs.assets_dir : '',
+  scripts: utils.backendDirCheck(ROOT_DIR, pref.backend.synced_dirs.scripts_dir) ? pref.backend.synced_dirs.scripts_dir : '',
+  styles: utils.backendDirCheck(ROOT_DIR, pref.backend.synced_dirs.styles_dir) ? pref.backend.synced_dirs.styles_dir : '',
+  templates: utils.backendDirCheck(ROOT_DIR, pref.backend.synced_dirs.templates_dir) ? pref.backend.synced_dirs.templates_dir : ''
+};
+
+const cvsExtDefaults = {
+  assets: utils.extCheck(pref.backend.synced_dirs.assets_ext),
+  scripts: utils.extCheck(pref.backend.synced_dirs.scripts_ext),
+  styles: utils.extCheck(pref.backend.synced_dirs.styles_ext),
+  templates: utils.extCheck(pref.backend.synced_dirs.templates_ext)
+};
+
+const plnDirDefaults = {
+  assets: `${ROOT_DIR}/${conf.src}/assets`,
+  scripts: `${ROOT_DIR}/${conf.src}/scripts/src`,
+  styles: `${ROOT_DIR}/${conf.src}/styles`,
+  templates: `${ROOT_DIR}/${conf.src}/_patterns/03-templates`
+};
 
 function cvsProcessExec(cmd, file) {
   var stdout = execSync(`cvs ${cmd} ${file}`, {encoding: conf.enc}).trim();
@@ -24,66 +42,78 @@ function cvsProcessExec(cmd, file) {
   }
 }
 
-function cvsProcess(cmd) {
-  var files = glob.sync(`${conf.src}/_patterns/03-templates/**/*.yml`);
+function cvsProcess(cmd, argv) {
+  var types = ['assets', 'scripts', 'styles', 'templates'];
 
   // ///////////////////////////////////////////////////////////////////////////
-  // First, process template patterns with corresponding YAML files.
+  // First, process Pattern Lab files with corresponding YAML files.
   // ///////////////////////////////////////////////////////////////////////////
-  for (let i = 0; i < files.length; i++) {
-    let cvsDir = '';
-    let cvsFile = '';
-    let data = {};
-    let stats = null;
-    let templatesDir = '';
-    let templatesExt = '';
-    let yml = '';
+  for (let i = 0; i < types.length; i++) {
+    let files = glob.sync(plnDirDefaults[types[i]] + '/**/*.yml');
 
-    try {
-      stats = fs.statSync(files[i]);
-    }
-    catch (err) {
-      // Fail gracefully.
-      continue;
-    }
+    for (let j = 0; j < files.length; j++) {
+      let cvsDir = '';
+      let cvsExt = '';
+      let cvsFile = '';
+      let data = {};
+      let nestedDirs = '';
+      let stats = null;
+      let yml = '';
 
-    // Only process valid files.
-    if (!stats || !stats.isFile()) {
-      continue;
-    }
+      try {
+        stats = fs.statSync(files[j]);
+      }
+      catch (err) {
+        // Fail gracefully.
+        continue;
+      }
 
-    try {
-      yml = fs.readFileSync(files[i], conf.enc);
-      data = yaml.safeLoad(yml);
-    }
-    catch (err) {
-      utils.error(err);
-      continue;
-    }
+      // Only process valid files.
+      if (!stats || !stats.isFile()) {
+        continue;
+      }
 
-    if (typeof data.templates_dir === 'string') {
-      templatesDir = utils.backendDirCheck(ROOT_DIR, data.templates_dir);
-    }
-    else {
-      templatesDir = TEMPLATES_DIR_DEFAULT;
-    }
+      try {
+        yml = fs.readFileSync(files[j], conf.enc);
+        data = yaml.safeLoad(yml);
+      }
+      catch (err) {
+        utils.error(err);
+        continue;
+      }
 
-    if (typeof data.templates_ext === 'string') {
-      templatesExt = utils.extCheck(data.templates_ext);
-    }
-    else {
-      templatesExt = TEMPLATES_EXT_DEFAULT;
-    }
+      if (typeof data[`${types[i]}_dir`] === 'string') {
+        cvsDir = utils.backendDirCheck(ROOT_DIR, data[`${types[i]}_dir`]) ? data[`${types[i]}_dir`] : '';
+        cvsDir = cvsDir.trim();
+      }
+      else {
+        nestedDirs = path.dirname(files[j]).replace(plnDirDefaults[types[i]], '');
+        cvsDir = cvsDirDefaults.types[i] + nestedDirs;
+      }
 
-    if (templatesDir && templatesExt) {
-      cvsDir = utils.backendDirCheck(ROOT_DIR, data.templates_dir).replace(`${ROOT_DIR}/`, '');
-      cvsFile = cvsDir + '/' + path.basename(files[i]).replace(/\.yml$/, `.${templatesExt}`);
-      cvsProcessExec(cmd, cvsFile);
+      if (typeof data[`${types[i]}_ext`] === 'string') {
+        cvsExt = utils.extCheck(data[`${types[i]}_ext`]);
+      }
+      else {
+        cvsExt = cvsExtDefaults[types[i]];
+      }
+
+      if (cvsDir && cvsExt) {
+        if (argv && argv.d) {
+          cvsDir = `${argv.d}/${cvsDir}`;
+        }
+        else {
+          cvsDir = `backend/${cvsDir}`;
+        }
+
+        cvsFile = cvsDir + '/' + path.basename(files[j]).replace(/\.yml$/, `.${cvsExt}`);
+        cvsProcessExec(cmd, cvsFile);
+      }
     }
   }
 
   // ///////////////////////////////////////////////////////////////////////////
-  // Next, process files listed in cvs.yml.
+  // Next, process files listed in cvs-files.yml.
   // ///////////////////////////////////////////////////////////////////////////
   let yml = '';
   let data = {};
@@ -102,20 +132,14 @@ function cvsProcess(cmd) {
   }
 
   for (let i = 0; i < data.cvs_files.length; i++) {
-    let cvsFile = `backend/${data.cvs_files[i]}`;
+    let cvsFile = '';
     let stats = null;
 
-    try {
-      stats = fs.statSync(cvsFile);
+    if (argv && argv.d) {
+      cvsFile = `${argv.d}/${data.cvs_files[i]}`;
     }
-    catch (err) {
-      // Fail gracefully.
-      continue;
-    }
-
-    // Only process valid files.
-    if (!stats || !stats.isFile()) {
-      continue;
+    else {
+      cvsFile = `backend/${data.cvs_files[i]}`;
     }
 
     cvsProcessExec(cmd, cvsFile);
@@ -124,6 +148,8 @@ function cvsProcess(cmd) {
 
 // Requires a single argument of -c
 gulp.task('cvs', function (cb) {
+  let argv = require('yargs')(process.argv).argv;
+
   if (argv.c && typeof argv.c === 'string') {
     // Fepper's fp bash script replaces single-quotes with double-quotes.
     // We need to strip those double-quotes.
@@ -136,8 +162,26 @@ gulp.task('cvs', function (cb) {
   cb();
 });
 
+// Requires a single argument of -d
+gulp.task('cvs:co', function (cb) {
+  let argv = require('yargs')(process.argv).argv;
+
+  if (argv.d && typeof argv.d === 'string') {
+    // Must change working dir in order for CVS checkout to work.
+    process.chdir('../');
+    cvsProcess('co', argv);
+    process.chdir(`${__dirname}/../../../`);
+  }
+  else {
+    utils.error('Error: need a -d argument!');
+  }
+  cb();
+});
+
 // Requires a single argument of -m
 gulp.task('cvs:commit', function (cb) {
+  let argv = require('yargs')(process.argv).argv;
+
   if (argv.m && typeof argv.m === 'string') {
     cvsProcess(`commit -m ${argv.m}`);
   }
