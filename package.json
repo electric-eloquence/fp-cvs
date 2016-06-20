@@ -1,6 +1,6 @@
 {
   "name": "fp-cvs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CVS extension for Fepper",
   "repository": {
     "type": "git",
