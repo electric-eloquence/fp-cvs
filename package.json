@@ -10,7 +10,7 @@
   "engines": {
     "node": ">= 4.0.0"
   },
-  "devDependencies": {
+  "dependencies": {
     "yargs": "^4.7.1"
   }
 }
