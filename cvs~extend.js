@@ -29,9 +29,9 @@ const cvsExtDefaults = {
 };
 
 const plnDirDefaults = {
-  assets: `${ROOT_DIR}/${conf.src}/assets`,
-  scripts: `${ROOT_DIR}/${conf.src}/scripts/src`,
-  styles: `${ROOT_DIR}/${conf.src}/styles`,
+  assets: `${ROOT_DIR}/${conf.src}/_assets`,
+  scripts: `${ROOT_DIR}/${conf.src}/_scripts/src`,
+  styles: `${ROOT_DIR}/${conf.src}/_styles`,
   templates: `${ROOT_DIR}/${conf.src}/_patterns/03-templates`
 };
 
