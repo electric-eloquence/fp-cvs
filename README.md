@@ -4,7 +4,7 @@
 
 ```shell
 fp cvs:co -d "top-level directory (just below $CVSROOT)"
-fp cvs:status
+fp cvs:st
 fp cvs:up
 fp cvs:ci -m "commit message"
 fp cvs -c "CVS command"

@@ -191,8 +191,8 @@ gulp.task('cvs:ci', function (cb) {
   cb();
 });
 
-gulp.task('cvs:status', function (cb) {
-  cvsProcess('status');
+gulp.task('cvs:st', function (cb) {
+  cvsProcess('st');
   cb();
 });
 
