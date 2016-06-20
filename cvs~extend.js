@@ -162,6 +162,19 @@ gulp.task('cvs', function (cb) {
   cb();
 });
 
+// Requires a single argument of -m
+gulp.task('cvs:ci', function (cb) {
+  let argv = require('yargs')(process.argv).argv;
+
+  if (argv.m && typeof argv.m === 'string') {
+    cvsProcess(`ci -m ${argv.m}`);
+  }
+  else {
+    utils.error('Error: need a -m argument!');
+  }
+  cb();
+});
+
 // Requires a single argument of -d
 gulp.task('cvs:co', function (cb) {
   let argv = require('yargs')(process.argv).argv;
@@ -174,19 +187,6 @@ gulp.task('cvs:co', function (cb) {
   }
   else {
     utils.error('Error: need a -d argument!');
-  }
-  cb();
-});
-
-// Requires a single argument of -m
-gulp.task('cvs:ci', function (cb) {
-  let argv = require('yargs')(process.argv).argv;
-
-  if (argv.m && typeof argv.m === 'string') {
-    cvsProcess(`ci -m ${argv.m}`);
-  }
-  else {
-    utils.error('Error: need a -m argument!');
   }
   cb();
 });
