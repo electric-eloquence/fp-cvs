@@ -133,7 +133,6 @@ function cvsProcess(cmd, argv) {
 
   for (let i = 0; i < data.cvs_files.length; i++) {
     let cvsFile = '';
-    let stats = null;
 
     if (argv && argv.d) {
       cvsFile = `${argv.d}/${data.cvs_files[i]}`;
