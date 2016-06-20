@@ -179,11 +179,11 @@ gulp.task('cvs:co', function (cb) {
 });
 
 // Requires a single argument of -m
-gulp.task('cvs:commit', function (cb) {
+gulp.task('cvs:ci', function (cb) {
   let argv = require('yargs')(process.argv).argv;
 
   if (argv.m && typeof argv.m === 'string') {
-    cvsProcess(`commit -m ${argv.m}`);
+    cvsProcess(`ci -m ${argv.m}`);
   }
   else {
     utils.error('Error: need a -m argument!');
