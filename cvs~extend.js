@@ -114,11 +114,13 @@ function cvsProcess(cmd, argv) {
       }
 
       if (cvsDir && cvsExt) {
-        if (cmd === 'co' && argv && argv.d) {
-          cvsDir = `${argv.d}/${cvsDir}`;
+        if (cmd === 'co') {
+          if (argv && argv.d) {
+            cvsDir = `${argv.d}/${cvsDir}`;
+          }
         }
         else {
-          cvsDir = `${cvsDir}`;
+          cvsDir = `backend/${cvsDir}`;
         }
 
         cvsFile = cvsDir + '/' + path.basename(files[j]).replace(/\.yml$/, `.${cvsExt}`);
@@ -158,7 +160,7 @@ function cvsProcess(cmd, argv) {
       }
     }
     else {
-      cvsFile = `${data.cvs_files[i]}`;
+      cvsFile = `backend/${data.cvs_files[i]}`;
     }
 
     cvsProcessExec(cmd, cvsFile);
