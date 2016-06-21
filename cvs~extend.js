@@ -118,7 +118,7 @@ function cvsProcess(cmd, argv) {
           cvsDir = `${argv.d}/${cvsDir}`;
         }
         else {
-          cvsDir = `backend/${cvsDir}`;
+          cvsDir = `${cvsDir}`;
         }
 
         cvsFile = cvsDir + '/' + path.basename(files[j]).replace(/\.yml$/, `.${cvsExt}`);
@@ -158,7 +158,7 @@ function cvsProcess(cmd, argv) {
       }
     }
     else {
-      cvsFile = `backend/${data.cvs_files[i]}`;
+      cvsFile = `${data.cvs_files[i]}`;
     }
 
     cvsProcessExec(cmd, cvsFile);
