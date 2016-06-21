@@ -15,10 +15,10 @@ const utils = require('../../../core/lib/utils');
 const ROOT_DIR = utils.rootDir();
 
 const cvsDirDefaults = {
-  assets: utils.backendDirCheck(ROOT_DIR, pref.backend.synced_dirs.assets_dir) ? pref.backend.synced_dirs.assets_dir : '',
-  scripts: utils.backendDirCheck(ROOT_DIR, pref.backend.synced_dirs.scripts_dir) ? pref.backend.synced_dirs.scripts_dir : '',
-  styles: utils.backendDirCheck(ROOT_DIR, pref.backend.synced_dirs.styles_dir) ? pref.backend.synced_dirs.styles_dir : '',
-  templates: utils.backendDirCheck(ROOT_DIR, pref.backend.synced_dirs.templates_dir) ? pref.backend.synced_dirs.templates_dir : ''
+  assets: pref.backend.synced_dirs.assets_dir,
+  scripts: pref.backend.synced_dirs.scripts_dir,
+  styles: pref.backend.synced_dirs.styles_dir,
+  templates: pref.backend.synced_dirs.templates_dir
 };
 
 const cvsExtDefaults = {
@@ -83,12 +83,27 @@ function cvsProcess(cmd, argv) {
       }
 
       if (typeof data[`${types[i]}_dir`] === 'string') {
-        cvsDir = utils.backendDirCheck(ROOT_DIR, data[`${types[i]}_dir`]) ? data[`${types[i]}_dir`] : '';
+        cvsDir = data[`${types[i]}_dir`];
+
+        // Don't want to validate local existence if checking out.
+        if (cmd !== 'co') {
+          cvsDir = utils.backendDirCheck(cvsDir) ? cvsDir : '';
+        }
+
         cvsDir = cvsDir.trim();
       }
       else {
-        nestedDirs = path.dirname(files[j]).replace(plnDirDefaults[types[i]], '');
-        cvsDir = cvsDirDefaults.types[i] + nestedDirs;
+        cvsDir = cvsDirDefaults.types[i];
+
+        // Don't want to validate local existence if checking out.
+        if (cmd !== 'co') {
+          cvsDir = utils.backendDirCheck(cvsDir) ? cvsDir : '';
+        }
+
+        if (cvsDir) {
+          nestedDirs = path.dirname(files[j]).replace(plnDirDefaults[types[i]], '');
+          cvsDir += nestedDirs;
+        }
       }
 
       if (typeof data[`${types[i]}_ext`] === 'string') {
