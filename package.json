@@ -1,6 +1,6 @@
 {
   "name": "fp-cvs",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "CVS extension for Fepper",
   "dependencies": {
     "yargs": "^4.7.1"
