@@ -99,7 +99,7 @@ function cvsProcess(cmd, argv) {
       }
 
       if (cvsDir && cvsExt) {
-        if (argv && argv.d) {
+        if (cmd === 'co' && argv && argv.d) {
           cvsDir = `${argv.d}/${cvsDir}`;
         }
         else {
@@ -134,8 +134,13 @@ function cvsProcess(cmd, argv) {
   for (let i = 0; i < data.cvs_files.length; i++) {
     let cvsFile = '';
 
-    if (argv && argv.d) {
-      cvsFile = `${argv.d}/${data.cvs_files[i]}`;
+    if (cmd === 'co') {
+      if (argv && argv.d) {
+        cvsFile = `${argv.d}/${data.cvs_files[i]}`;
+      }
+      else {
+        cvsFile = data.cvs_files[i];
+      }
     }
     else {
       cvsFile = `backend/${data.cvs_files[i]}`;
@@ -174,19 +179,14 @@ gulp.task('cvs:ci', function (cb) {
   cb();
 });
 
-// Requires a single argument of -d
+// Takes an optional argument of -d
 gulp.task('cvs:co', function (cb) {
   let argv = require('yargs')(process.argv).argv;
 
-  if (argv.d && typeof argv.d === 'string') {
-    // Must change working dir in order for CVS checkout to work.
-    process.chdir('../');
-    cvsProcess('co', argv);
-    process.chdir(`${__dirname}/../../../`);
-  }
-  else {
-    utils.error('Error: need a -d argument!');
-  }
+  // Must change working dir in order for CVS checkout to work.
+  process.chdir('../');
+  cvsProcess('co', argv);
+  process.chdir(`${__dirname}/../../../`);
   cb();
 });
 

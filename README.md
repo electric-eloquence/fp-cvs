@@ -3,7 +3,7 @@
 ### Commands
 
 ```shell
-fp cvs:co -d "top-level directory (just below $CVSROOT)"
+fp cvs:co [-d "directory path between $CVSROOT and backend symbolic link"]
 fp cvs:st
 fp cvs:up
 fp cvs:ci -m "commit message"
