@@ -83,21 +83,19 @@ function cvsProcess(cmd, argv) {
       }
 
       if (typeof data[`${types[i]}_dir`] === 'string') {
-        cvsDir = data[`${types[i]}_dir`];
+        cvsDir = data[`${types[i]}_dir`].trim();
 
         // Don't want to validate local existence if checking out.
         if (cmd !== 'co') {
-          cvsDir = utils.backendDirCheck(cvsDir) ? cvsDir : '';
+          cvsDir = utils.backendDirCheck(ROOT_DIR, cvsDir) ? cvsDir : '';
         }
-
-        cvsDir = cvsDir.trim();
       }
       else {
         cvsDir = cvsDirDefaults.types[i];
 
         // Don't want to validate local existence if checking out.
         if (cmd !== 'co') {
-          cvsDir = utils.backendDirCheck(cvsDir) ? cvsDir : '';
+          cvsDir = utils.backendDirCheck(ROOT_DIR, cvsDir) ? cvsDir : '';
         }
 
         if (cvsDir) {
