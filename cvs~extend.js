@@ -2,6 +2,8 @@
 
 const conf = global.conf;
 const pref = global.pref;
+const appDir = global.appDir;
+const rootDir = global.rootDir;
 
 const execSync = require('child_process').execSync;
 const fs = require('fs-extra');
@@ -10,9 +12,9 @@ const gulp = require('gulp');
 const path = require('path');
 const yaml = require('js-yaml');
 
-const utils = require('../../../core/lib/utils');
+const utils = require('../../../app/core/lib/utils');
 
-const ROOT_DIR = utils.rootDir();
+const srcDir = `${rootDir}/${conf.ui.paths.source.root}`;
 
 const cvsDirDefaults = {
   assets: pref.backend.synced_dirs.assets_dir,
@@ -29,10 +31,10 @@ const cvsExtDefaults = {
 };
 
 const plnDirDefaults = {
-  assets: `${ROOT_DIR}/${conf.src}/_assets`,
-  scripts: `${ROOT_DIR}/${conf.src}/_scripts/src`,
-  styles: `${ROOT_DIR}/${conf.src}/_styles`,
-  templates: `${ROOT_DIR}/${conf.src}/_patterns/03-templates`
+  assets: `${srcDir}/_assets`,
+  scripts: `${srcDir}/_scripts/src`,
+  styles: `${srcDir}/_styles`,
+  templates: `${srcDir}/_patterns/03-templates`
 };
 
 function cvsProcessExec(cmd, file) {
@@ -87,7 +89,7 @@ function cvsProcess(cmd, argv) {
 
         // Don't want to validate local existence if checking out.
         if (cmd !== 'co') {
-          cvsDir = utils.backendDirCheck(ROOT_DIR, cvsDir) ? cvsDir : '';
+          cvsDir = utils.backendDirCheck(rootDir, cvsDir) ? cvsDir : '';
         }
       }
       else {
@@ -95,7 +97,7 @@ function cvsProcess(cmd, argv) {
 
         // Don't want to validate local existence if checking out.
         if (cmd !== 'co') {
-          cvsDir = utils.backendDirCheck(ROOT_DIR, cvsDir) ? cvsDir : '';
+          cvsDir = utils.backendDirCheck(rootDir, cvsDir) ? cvsDir : '';
         }
 
         if (cvsDir) {
@@ -122,6 +124,8 @@ function cvsProcess(cmd, argv) {
         }
 
         cvsFile = cvsDir + '/' + path.basename(files[j]).replace(/\.yml$/, `.${cvsExt}`);
+console.info(cvsFile);
+process.exit();
         cvsProcessExec(cmd, cvsFile);
       }
     }
@@ -134,7 +138,7 @@ function cvsProcess(cmd, argv) {
   let data = {};
 
   try {
-    yml = fs.readFileSync(`${ROOT_DIR}/extend/custom/fp-cvs/cvs.yml`, conf.enc);
+    yml = fs.readFileSync(`${rootDir}/extend/custom/fp-cvs/cvs.yml`, conf.enc);
     data = yaml.safeLoad(yml);
   }
   catch (err) {
@@ -165,9 +169,15 @@ function cvsProcess(cmd, argv) {
   }
 }
 
+// Vars for Gulp tasks.
+var pathIn = rootDir;
+var pathOut = appDir;
+
 // Requires a single argument of -c
 gulp.task('cvs', function (cb) {
   let argv = require('yargs')(process.argv).argv;
+
+  process.chdir(pathIn);
 
   if (argv.c && typeof argv.c === 'string') {
     // Fepper's fp bash script replaces single-quotes with double-quotes.
@@ -178,6 +188,8 @@ gulp.task('cvs', function (cb) {
   else {
     utils.error('Error: need a -c argument!');
   }
+
+  process.chdir(pathOut);
   cb();
 });
 
@@ -185,12 +197,16 @@ gulp.task('cvs', function (cb) {
 gulp.task('cvs:ci', function (cb) {
   let argv = require('yargs')(process.argv).argv;
 
+  process.chdir(pathIn);
+
   if (argv.m && typeof argv.m === 'string') {
     cvsProcess(`ci -m ${argv.m}`);
   }
   else {
     utils.error('Error: need a -m argument!');
   }
+
+  process.chdir(pathOut);
   cb();
 });
 
@@ -198,19 +214,23 @@ gulp.task('cvs:ci', function (cb) {
 gulp.task('cvs:co', function (cb) {
   let argv = require('yargs')(process.argv).argv;
 
-  // Must change working dir in order for CVS checkout to work.
-  process.chdir('../');
+  // Must change working dir even higher in order for CVS checkout to work.
+  process.chdir(`${pathIn}/../`);
   cvsProcess('co', argv);
-  process.chdir(`${__dirname}/../../../`);
+  process.chdir(pathOut);
   cb();
 });
 
 gulp.task('cvs:st', function (cb) {
+  process.chdir(pathIn);
   cvsProcess('st');
+  process.chdir(pathOut);
   cb();
 });
 
 gulp.task('cvs:up', function (cb) {
+  process.chdir(pathIn);
   cvsProcess('up');
+  process.chdir(pathOut);
   cb();
 });
