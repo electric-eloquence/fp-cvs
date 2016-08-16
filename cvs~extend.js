@@ -124,8 +124,6 @@ function cvsProcess(cmd, argv) {
         }
 
         cvsFile = cvsDir + '/' + path.basename(files[j]).replace(/\.yml$/, `.${cvsExt}`);
-console.info(cvsFile);
-process.exit();
         cvsProcessExec(cmd, cvsFile);
       }
     }
