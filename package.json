@@ -2,9 +2,6 @@
   "name": "fp-cvs",
   "version": "0.4.0",
   "description": "CVS extension for Fepper",
-  "dependencies": {
-    "yargs": "^4.7.1"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/electric-eloquence/fp-cvs.git"
@@ -12,5 +9,8 @@
   "license": "MIT",
   "engines": {
     "node": ">= 4.0.0"
+  },
+  "devDependencies": {
+    "yargs": "^4.7.1"
   }
 }
