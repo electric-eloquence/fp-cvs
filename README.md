@@ -1,7 +1,6 @@
 # CVS extension for Fepper
 
 ### Commands
-
 ```shell
 fp cvs:co [-d "directory path between $CVSROOT and backend symbolic link"]
 fp cvs:st
