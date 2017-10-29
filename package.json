@@ -5,7 +5,7 @@
   "main": "cvs~extend.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/electric-eloquence/fp-cvs.git"
+    "url": "git+https://github.com/electric-eloquence/fp-cvs.git"
   },
   "keywords": [
     "atomic",
@@ -26,6 +26,10 @@
     "template"
   ],
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/electric-eloquence/fp-cvs/issues"
+  },
+  "homepage": "https://github.com/electric-eloquence/fp-cvs#readme",
   "engines": {
     "node": ">= 8.5.0"
   },
