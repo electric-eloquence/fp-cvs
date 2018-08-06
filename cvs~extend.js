@@ -1,18 +1,18 @@
 'use strict';
 
+const execSync = require('child_process').execSync;
+const path = require('path');
+
+const fs = require('fs-extra');
+const glob = require('glob');
+const gulp = require('gulp');
+const utils = require('fepper-utils');
+const yaml = require('js-yaml');
+
 const conf = global.conf;
 const pref = global.pref;
 const appDir = global.appDir;
 const rootDir = global.rootDir;
-
-const execSync = require('child_process').execSync;
-const fs = require('fs-extra');
-const glob = require('glob');
-const gulp = require('gulp');
-const path = require('path');
-const yaml = require('js-yaml');
-
-const utils = require('../../../app/core/lib/utils');
 
 const srcDir = `${rootDir}/${conf.ui.paths.source.root}`;
 
@@ -24,10 +24,10 @@ const cvsDirDefaults = {
 };
 
 const cvsExtDefaults = {
-  assets: utils.extCheck(pref.backend.synced_dirs.assets_ext),
-  scripts: utils.extCheck(pref.backend.synced_dirs.scripts_ext),
-  styles: utils.extCheck(pref.backend.synced_dirs.styles_ext),
-  templates: utils.extCheck(pref.backend.synced_dirs.templates_ext)
+  assets: utils.extNormalize(pref.backend.synced_dirs.assets_ext),
+  scripts: utils.extNormalize(pref.backend.synced_dirs.scripts_ext),
+  styles: utils.extNormalize(pref.backend.synced_dirs.styles_ext),
+  templates: utils.extNormalize(pref.backend.synced_dirs.templates_ext)
 };
 
 const plnDirDefaults = {
@@ -38,20 +38,21 @@ const plnDirDefaults = {
 };
 
 function cvsProcessExec(cmd, file) {
-  var stdout = execSync(`cvs ${cmd} ${file}`, {encoding: conf.enc}).trim();
+  const stdout = execSync(`cvs ${cmd} ${file}`, {encoding: conf.enc}).trim();
+
   if (stdout) {
     utils.log(stdout);
   }
 }
 
 function cvsProcess(cmd, argv) {
-  var types = ['assets', 'scripts', 'styles', 'templates'];
+  const types = ['assets', 'scripts', 'styles', 'templates'];
 
   // ///////////////////////////////////////////////////////////////////////////
   // First, process Pattern Lab files with corresponding YAML files.
   // ///////////////////////////////////////////////////////////////////////////
   for (let i = 0; i < types.length; i++) {
-    let files = glob.sync(plnDirDefaults[types[i]] + '/**/*.yml');
+    const files = glob.sync(plnDirDefaults[types[i]] + '/**/*.yml');
 
     for (let j = 0; j < files.length; j++) {
       let cvsDir = '';
@@ -107,7 +108,7 @@ function cvsProcess(cmd, argv) {
       }
 
       if (typeof data[`${types[i]}_ext`] === 'string') {
-        cvsExt = utils.extCheck(data[`${types[i]}_ext`]);
+        cvsExt = utils.extNormalize(data[`${types[i]}_ext`]);
       }
       else {
         cvsExt = cvsExtDefaults[types[i]];
@@ -144,7 +145,7 @@ function cvsProcess(cmd, argv) {
     return;
   }
 
-  if (!data instanceof Object || !Array.isArray(data.cvs_files)) {
+  if (!(data instanceof Object) || !Array.isArray(data.cvs_files)) {
     return;
   }
 
@@ -168,12 +169,12 @@ function cvsProcess(cmd, argv) {
 }
 
 // Vars for Gulp tasks.
-var pathIn = rootDir;
-var pathOut = appDir;
+const pathIn = rootDir;
+const pathOut = appDir;
 
 // Requires a single argument of -c
 gulp.task('cvs', function (cb) {
-  let argv = require('yargs')(process.argv).argv;
+  const argv = require('yargs').argv;
 
   process.chdir(pathIn);
 
@@ -193,7 +194,7 @@ gulp.task('cvs', function (cb) {
 
 // Requires a single argument of -m
 gulp.task('cvs:ci', function (cb) {
-  let argv = require('yargs')(process.argv).argv;
+  const argv = require('yargs').argv;
 
   process.chdir(pathIn);
 
@@ -210,7 +211,7 @@ gulp.task('cvs:ci', function (cb) {
 
 // Takes an optional argument of -d
 gulp.task('cvs:co', function (cb) {
-  let argv = require('yargs')(process.argv).argv;
+  const argv = require('yargs').argv;
 
   // Must change working dir even higher in order for CVS checkout to work.
   process.chdir(`${pathIn}/../`);
