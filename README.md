@@ -16,4 +16,4 @@ fp cvs -c "CVS command"
 with corresponding YAML configs and determining if there exist corresponding 
 backend files. To process additional CVS-revisioned files, create a directory 
 named `extend/custom/fp-cvs`, and a file within named `cvs.yml`, and list them 
-therein. Base it off the empty YAML file in this NPM named `default.cvs.yml`.
+therein. Base it off the empty YAML file in this npm named `default.cvs.yml`.
