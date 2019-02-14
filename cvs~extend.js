@@ -60,11 +60,11 @@ function cvsProcess(cmd, argv) {
       let cvsFile = '';
       let data = {};
       let nestedDirs = '';
-      let stats = null;
+      let stat;
       let yml = '';
 
       try {
-        stats = fs.statSync(files[j]);
+        stat = fs.statSync(files[j]);
       }
       catch (err) {
         // Fail gracefully.
@@ -72,7 +72,7 @@ function cvsProcess(cmd, argv) {
       }
 
       // Only process valid files.
-      if (!stats || !stats.isFile()) {
+      if (!stat || !stat.isFile()) {
         continue;
       }
 
