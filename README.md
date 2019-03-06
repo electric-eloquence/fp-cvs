@@ -1,4 +1,4 @@
-# CVS extension for Fepper
+# CVS (Concurrent Versions System) extension for Fepper
 
 ### Commands
 
